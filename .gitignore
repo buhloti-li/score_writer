@@ -13,3 +13,10 @@ venv/
 node_modules/
 .mypy_cache/
 .ruff_cache/
+
+# Next.js
+.next/
+out/
+
+# Storage
+storage/uploads/

@@ -83,6 +83,35 @@ class ScoreService:
             raise ScoreServiceError("Score not found")
         await self.repo.increment_download_count(score_id)
 
+    async def search_scores(
+        self,
+        query: str = "",
+        instrument: str | None = None,
+        genre: str | None = None,
+        difficulty: int | None = None,
+        offset: int = 0,
+        limit: int = 20,
+    ) -> tuple[Sequence[Score], int]:
+        filters = [
+            Score.status == ScoreStatus.AVAILABLE,
+        ]
+        if query:
+            filters.append(
+                Score.title.ilike(f"%{query}%")
+                | Score.title_en.ilike(f"%{query}%")
+                | Score.composer.ilike(f"%{query}%")
+            )
+        if instrument:
+            filters.append(Score.instrument == instrument)
+        if genre:
+            filters.append(Score.genre == genre)
+        if difficulty:
+            filters.append(Score.difficulty == difficulty)
+
+        items = await self.repo.find_by(filters, offset, limit)
+        total = await self.repo.count(filters)
+        return items, total
+
     async def set_files(
         self,
         score_id: uuid.UUID,

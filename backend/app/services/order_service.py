@@ -87,6 +87,11 @@ class OrderService:
         )
         return updated
 
+    async def list_all_orders(
+        self, offset: int = 0, limit: int = 20
+    ) -> Sequence[Order]:
+        return await self.order_repo.get_all(offset=offset, limit=limit)
+
     async def refund(self, order_id: uuid.UUID) -> Order:
         order = await self.order_repo.get_by_id(order_id)
         if not order:
